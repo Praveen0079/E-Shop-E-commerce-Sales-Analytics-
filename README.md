@@ -103,12 +103,12 @@ mysql-ecommerce-analytics/
 
 3. **Build the schema**
    ```bash
-   mysql -u root -p shop < schema/01_create_tables.sql
+   mysql -u root -p shop < schema/table-create.sql
    ```
 
 4. **Load the sample data**
    ```bash
-   mysql -u root -p shop < schema/02_insert_data.sql
+   mysql -u root -p shop < schema/table-insert-values.sql
    ```
 
 5. **Run any analytical query**
