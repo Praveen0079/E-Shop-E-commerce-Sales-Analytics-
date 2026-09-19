@@ -10,7 +10,7 @@ Built as part of [CodeWithHarry's Ultimate Job-Ready AI-Powered Data Analytics C
 
 This project models a simplified e-commerce business (`shop` database) with customers, products, orders, order line items, and payments. On top of the schema, it implements four analytical SQL queries that answer common business questions: cumulative revenue trends, category-level performance, top-selling products, and payment mode distribution.
 
-**Tech stack:** MySQL 8.x, ANSI SQL
+**Tech stack:** MySQL 8.x, ANSI SQL window functions, `GROUP BY ... WITH ROLLUP`
 
 ---
 
@@ -80,8 +80,43 @@ mysql-ecommerce-analytics/
     ├── 01_rolling_total_payments.sql   -- cumulative running total (window function)
     ├── 02_revenue_by_category.sql      -- category revenue (WITH ROLLUP)
     ├── 03_revenue_by_product.sql       -- top-selling products (joins + ranking)
-    └── 04_payment_mode_distribution.sql -- payment mode totals (WITH ROLLUP)
+    ├── 04_payment_mode_distribution.sql -- payment mode totals (WITH ROLLUP)
+    └── 05_customer_spend_ranking.sql    -- customer ranking (DENSE_RANK)
 ```
+
+---
+
+## Setup & Execution
+
+**Prerequisites:** MySQL 8.0+ (for window function support) and a MySQL client (CLI, MySQL Workbench, or similar).
+
+1. **Clone the repo**
+   ```bash
+   git clone https://github.com/Praveen0079/mysql-ecommerce-analytics.git
+   cd mysql-ecommerce-analytics
+   ```
+
+2. **Create the database**
+   ```sql
+   CREATE DATABASE shop;
+   ```
+
+3. **Build the schema**
+   ```bash
+   mysql -u root -p shop < schema/01_create_tables.sql
+   ```
+
+4. **Load the sample data**
+   ```bash
+   mysql -u root -p shop < schema/02_insert_data.sql
+   ```
+
+5. **Run any analytical query**
+   ```bash
+   mysql -u root -p shop < queries/01_rolling_total_payments.sql
+   ```
+
+   Or open the `.sql` files directly in MySQL Workbench / DBeaver and run them against the `shop` database.
 
 ---
 
@@ -133,14 +168,35 @@ GROUP BY payment_mode WITH ROLLUP;
 ```
 Breaks down total revenue by payment method (UPI, Credit Card, Debit Card) with a grand-total row, useful for understanding customer payment preferences.
 
+### 5. Customer Spend Ranking — `DENSE_RANK()`
+**File:** `queries/05_customer_spend_ranking.sql`
+
+```sql
+SELECT customer_name, total_spent, drk
+FROM (
+    SELECT
+        c.name AS customer_name,
+        SUM(oi.quantity * p.price) AS total_spent,
+        DENSE_RANK() OVER (
+            ORDER BY SUM(oi.quantity * p.price) DESC
+        ) AS drk
+    FROM customers c
+    JOIN orders o ON o.customer_id = c.customer_id
+    JOIN order_items oi ON oi.order_id = o.order_id
+    JOIN products p ON p.product_id = oi.product_id
+    GROUP BY c.name
+) AS ranked_customers;
+```
+Joins across all four supporting tables to compute each customer's total spend, then ranks customers with `DENSE_RANK()` — unlike `RANK()`, ties share the same rank with no gaps in the sequence that follows, making it well-suited for leaderboard-style reporting (e.g., "top spenders" lists) where skipped ranks would look odd.
+
 ---
 
 ## Key Learnings & Skills Demonstrated
 
 - Relational schema design with primary/foreign key constraints across 5 normalized tables
-- SQL window functions (`SUM() OVER`, frame clauses with `ROWS BETWEEN`)
+- SQL window functions (`SUM() OVER`, `DENSE_RANK() OVER`, frame clauses with `ROWS BETWEEN`)
 - Aggregate reporting with `GROUP BY ... WITH ROLLUP` for subtotal/grand-total summaries
-- Multi-table joins (2–3 tables) to answer business questions across a normalized schema
+- Multi-table joins (2–4 tables) to answer business questions across a normalized schema
 - Structuring a SQL project for readability and version control (schema/queries separation)
 
 ---
