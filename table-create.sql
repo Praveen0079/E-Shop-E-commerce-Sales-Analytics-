@@ -1,4 +1,4 @@
--- CREATE DATABASE shop;
+CREATE DATABASE shop;
 USE shop;
 CREATE TABLE customers(
 	customer_id INT PRIMARY KEY AUTO_INCREMENT,
