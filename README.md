@@ -10,7 +10,7 @@ Built as part of [CodeWithHarry's Ultimate Job-Ready AI-Powered Data Analytics C
 
 This project models a simplified e-commerce business (`shop` database) with customers, products, orders, order line items, and payments. On top of the schema, it implements four analytical SQL queries that answer common business questions: cumulative revenue trends, category-level performance, top-selling products, and payment mode distribution.
 
-**Tech stack:** MySQL 8.x, ANSI SQL window functions, `GROUP BY ... WITH ROLLUP`
+**Tech stack:** MySQL 8.x, ANSI SQL
 
 ---
 
@@ -82,40 +82,6 @@ mysql-ecommerce-analytics/
     ├── 03_revenue_by_product.sql       -- top-selling products (joins + ranking)
     └── 04_payment_mode_distribution.sql -- payment mode totals (WITH ROLLUP)
 ```
-
----
-
-## Setup & Execution
-
-**Prerequisites:** MySQL 8.0+ (for window function support) and a MySQL client (CLI, MySQL Workbench, or similar).
-
-1. **Clone the repo**
-   ```bash
-   git clone https://github.com/Praveen0079/mysql-ecommerce-analytics.git
-   cd mysql-ecommerce-analytics
-   ```
-
-2. **Create the database**
-   ```sql
-   CREATE DATABASE shop;
-   ```
-
-3. **Build the schema**
-   ```bash
-   mysql -u root -p shop < schema/01_create_tables.sql
-   ```
-
-4. **Load the sample data**
-   ```bash
-   mysql -u root -p shop < schema/02_insert_data.sql
-   ```
-
-5. **Run any analytical query**
-   ```bash
-   mysql -u root -p shop < queries/01_rolling_total_payments.sql
-   ```
-
-   Or open the `.sql` files directly in MySQL Workbench / DBeaver and run them against the `shop` database.
 
 ---
 
