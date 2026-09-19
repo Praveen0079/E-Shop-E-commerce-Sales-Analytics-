@@ -113,7 +113,7 @@ mysql-ecommerce-analytics/
 
 5. **Run any analytical query**
    ```bash
-   mysql -u root -p shop < queries/01_rolling_total_payments.sql
+   mysql -u root -p shop < queries/rolling_total_payments.sql
    ```
 
    Or open the `.sql` files directly in MySQL Workbench / DBeaver and run them against the `shop` database.
